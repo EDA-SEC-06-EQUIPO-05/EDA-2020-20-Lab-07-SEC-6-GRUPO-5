@@ -61,6 +61,23 @@ def newAnalyzer():
                                       comparefunction=compareDates)
     return analyzer
 
+def newAnalyzerA():
+    """ Inicializa el analizador
+
+    Crea una lista vacia para guardar todos los crimenes
+    Se crean indices (Maps) por los siguientes criterios:
+    -Fechas
+
+    Retorna el analizador inicializado.
+    """
+    analyzer = {'accidents': None,
+                'dateIndex': None
+                }
+
+    analyzer['accidents'] = lt.newList('SINGLE_LINKED', compareIds)
+    analyzer['dateIndex'] = om.newMap(omaptype='BST',
+                                      comparefunction=compareDates)
+    return analyzer
 
 # Funciones para agregar informacion al catalogo
 
@@ -70,6 +87,13 @@ def addCrime(analyzer, crime):
     """
     lt.addLast(analyzer['crimes'], crime)
     updateDateIndex(analyzer['dateIndex'], crime)
+    return analyzer
+
+def addAccident(analyzer, accident):
+    """
+    """
+    lt.addLast(analyzer['accidents'], accident)
+    updateDateIndexA(analyzer['dateIndex'], accident)
     return analyzer
 
 
@@ -93,6 +117,26 @@ def updateDateIndex(map, crime):
     addDateIndex(datentry, crime)
     return map
 
+def updateDateIndexA(map, accident):
+    """
+    Se toma la fecha del crimen y se busca si ya existe en el arbol
+    dicha fecha.  Si es asi, se adiciona a su lista de crimenes
+    y se actualiza el indice de tipos de crimenes.
+
+    Si no se encuentra creado un nodo para esa fecha en el arbol
+    se crea y se actualiza el indice de tipos de crimenes
+    """
+    occurreddate = accident['OCCURRED_ON_DATE']
+    accidentdate = datetime.datetime.strptime(occurreddate, '%Y-%m-%d %H:%M:%S')
+    entry = om.get(map, accidentdate.date())
+    if entry is None:
+        datentry = newDataEntry(accident)
+        om.put(map, accidentdate.date(), datentry)
+    else:
+        datentry = me.getValue(entry)
+    addDateIndex(datentry, accident)
+    return map
+
 
 def addDateIndex(datentry, crime):
     """
@@ -114,7 +158,6 @@ def addDateIndex(datentry, crime):
         lt.addLast(entry['lstoffenses'], crime)
     return datentry
 
-
 def newDataEntry(crime):
     """
     Crea una entrada en el indice por fechas, es decir en el arbol
@@ -127,6 +170,17 @@ def newDataEntry(crime):
     entry['lstcrimes'] = lt.newList('SINGLE_LINKED', compareDates)
     return entry
 
+def newDataSeverityEntry(crime):
+    """
+    Crea una entrada en el indice por fechas, es decir en el arbol
+    binario.
+    """
+    entry = {'severityIndex': None, 'lstaccidents': None}
+    entry['severityIndex'] = m.newMap(numelements=30,
+                                     maptype='PROBING',
+                                     comparefunction=compareSeverity)
+    entry['lstaccidents'] = lt.newList('SINGLE_LINKED', compareDates)
+    return entry
 
 def newOffenseEntry(offensegrp, crime):
     """
@@ -150,6 +204,11 @@ def crimesSize(analyzer):
     """
     return lt.size(analyzer['crimes'])
 
+def accidentsSize(analyzer):
+    """
+    Número de libros en el catago
+    """
+    return lt.size(analyzer['accidents'])
 
 def indexHeight(analyzer):
     """Numero de autores leido
@@ -177,7 +236,14 @@ def maxKey(analyzer):
 
 def getCrimesByRange(analyzer, initialDate, finalDate):
     """
-    Retorna el numero de crimenes en un rago de fechas.
+    Retorna el numero de crimenes en un rango de fechas.
+    """
+    lst = om.values(analyzer['dateIndex'], initialDate, finalDate)
+    return lst
+
+def getAccidentsByRange(analyzer, initialDate, finalDate):
+    """
+    Retorna el numero de accidentes en un rango de fechas.
     """
     lst = om.values(analyzer['dateIndex'], initialDate, finalDate)
     return lst
@@ -196,6 +262,17 @@ def getCrimesByRangeCode(analyzer, initialDate, offensecode):
             return m.size(me.getValue(numoffenses)['lstoffenses'])
         return 0
 
+def getAccidentsByRangeSeverity(analyzer, Date):
+    """
+    Para una fecha determinada, retorna el numero de accidentes de diferentes severidades.
+    """
+    accidentdate = om.get(analyzer['dateIndex'], Date)
+    if accidentdate["key"] is not None:
+        severitymap= me.getValue(accidentdate)['severityIndex']
+        numatype1= m.get(severitymap, "1")
+        numatype2= m.get(severitymap, "2")
+        numatype3= m.get(severitymap, "3")
+        
 
 # ==============================
 # Funciones de Comparacion
@@ -236,6 +313,19 @@ def compareOffenses(offense1, offense2):
     if (offense1 == offense):
         return 0
     elif (offense1 > offense):
+        return 1
+    else:
+        return -1
+
+def compareSeverity(severity1, severity2):
+    """
+    Compara dos ids de libros, id es un identificador
+    y entry una pareja llave-valor
+    """
+    severity = me.getKey(severity2)
+    if (severity1 == severity):
+        return 0
+    elif (severity1 > severity):
         return 1
     else:
         return -1

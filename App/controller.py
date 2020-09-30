@@ -63,6 +63,17 @@ def loadData(analyzer, crimesfile):
         model.addCrime(analyzer, crime)
     return analyzer
 
+def loadDataA(analyzer, accidentsfile):
+    """
+    Carga los datos de los archivos CSV en el modelo
+    """
+    accidentsfile = cf.data_dir + accidentsfile
+    input_file = csv.DictReader(open(accidentsfile, encoding="utf-8"),
+                                delimiter=",")
+    for accident in input_file:
+        model.addaccident(analyzer, accident)
+    return analyzer
+
 # ___________________________________________________
 #  Funciones para consultas
 # ___________________________________________________
@@ -112,6 +123,15 @@ def getCrimesByRange(analyzer, initialDate, finalDate):
     return model.getCrimesByRange(analyzer, initialDate.date(),
                                   finalDate.date())
 
+def getAccidentsByRange(analyzer, initialDate, finalDate):
+    """
+    Retorna el total de crimenes en un rango de fechas
+    """
+    initialDate = datetime.datetime.strptime(initialDate, '%Y-%m-%d')
+    finalDate = datetime.datetime.strptime(finalDate, '%Y-%m-%d')
+    return model.getAccidentsByRange(analyzer, initialDate.date(),
+                                  finalDate.date())
+
 
 def getCrimesByRangeCode(analyzer, initialDate,
                          offensecode):
@@ -122,3 +142,11 @@ def getCrimesByRangeCode(analyzer, initialDate,
     initialDate = datetime.datetime.strptime(initialDate, '%Y-%m-%d')
     return model.getCrimesByRangeCode(analyzer, initialDate.date(),
                                       offensecode)
+
+def getAccidentsByRangeSeverity(analyzer, initialDate):
+    """
+    Retorna el total de crimenes de un tipo especifico en una
+    fecha determinada
+    """
+    initialDate = datetime.datetime.strptime(initialDate, '%Y-%m-%d')
+    return model.getAccidentsByRangeSeverity(analyzer, initialDate.date())
