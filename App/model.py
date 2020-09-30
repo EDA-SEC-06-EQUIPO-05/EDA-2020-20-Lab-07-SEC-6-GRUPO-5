@@ -145,9 +145,9 @@ def addDateIndex(datentry, crime):
     el valor es una lista con los crimenes de dicho tipo en la fecha que
     se está consultando (dada por el nodo del arbol)
     """
-    lst = datentry['lstcrimes']
+    lst = datentry['lstaccidents']
     lt.addLast(lst, crime)
-    offenseIndex = datentry['offenseIndex']
+    offenseIndex = datentry['severityIndex']
     offentry = m.get(offenseIndex, crime['OFFENSE_CODE_GROUP'])
     if (offentry is None):
         entry = newOffenseEntry(crime['OFFENSE_CODE_GROUP'], crime)
@@ -156,6 +156,26 @@ def addDateIndex(datentry, crime):
     else:
         entry = me.getValue(offentry)
         lt.addLast(entry['lstoffenses'], crime)
+    return datentry
+
+def addDateIndexA(datentry, accident):
+    """
+    Actualiza un indice de tipo de crimenes.  Este indice tiene una lista
+    de crimenes y una tabla de hash cuya llave es el tipo de crimen y
+    el valor es una lista con los crimenes de dicho tipo en la fecha que
+    se está consultando (dada por el nodo del arbol)
+    """
+    lst = datentry['lstaccidents']
+    lt.addLast(lst, accident)
+    offenseIndex = datentry['severityIndex']
+    offentry = m.get(offenseIndex, accident['Severity'])
+    if (offentry is None):
+        entry = newSeverityEntry(accident['Severity'], accident)
+        lt.addLast(entry['lstaccidents'], accident)
+        m.put(offenseIndex, accident['Severity'], entry)
+    else:
+        entry = me.getValue(offentry)
+        lt.addLast(entry['lstaccidents'], accident)
     return datentry
 
 def newDataEntry(crime):
@@ -191,6 +211,16 @@ def newOffenseEntry(offensegrp, crime):
     ofentry['offense'] = offensegrp
     ofentry['lstoffenses'] = lt.newList('SINGLELINKED', compareOffenses)
     return ofentry
+
+def newSeverityEntry(clasificacion, accident):
+    """
+    Crea una entrada en el indice por tipo de crimen, es decir en
+    la tabla de hash, que se encuentra en cada nodo del arbol.
+    """
+    acentry = {'severidad': None, 'lstaccidents': None}
+    acentry['severidad'] = clasificacion
+    acentry['lstaccidents'] = lt.newList('SINGLELINKED', compareSeverity)
+    return acentry
 
 
 # ==============================
@@ -272,6 +302,11 @@ def getAccidentsByRangeSeverity(analyzer, Date):
         numatype1= m.get(severitymap, "1")
         numatype2= m.get(severitymap, "2")
         numatype3= m.get(severitymap, "3")
+        len_1= m.size(me.getValue(numatype1)['lstaccidents'])
+        len_2= m.size(me.getValue(numatype2)['lstaccidents'])
+        len_3= m.size(me.getValue(numatype3)['lstaccidents'])
+        total_accidentes= len_1+len_2+len_3
+    return (total_accidentes,len_1,len_2,len_3)
         
 
 # ==============================
