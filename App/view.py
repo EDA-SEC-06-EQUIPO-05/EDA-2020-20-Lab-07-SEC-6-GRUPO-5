@@ -38,7 +38,7 @@ operación seleccionada.
 # ___________________________________________________
 
 
-accidentsfile = 'us_accidents_small.csv'
+accidentsfile = 'us_accidents_dis_2016.csv'
 
 # ___________________________________________________
 #  Menu principal
@@ -52,7 +52,7 @@ def printMenu():
     print("1- Inicializar Analizador")
     print("2- Cargar información de accidentes")
     print("3- Consultar accidentes en un rango de fechas")
-    print("4- Consultar accidentes por severidad y fecha")
+    print("4- (LABORATORIO 7) Consultar accidentes por severidad y fecha")
     print("0- Salir")
     print("*******************************************")
 
@@ -86,13 +86,11 @@ while True:
         print("\nTotal de llaves en el rango: " + str(lt.size(lst)))
 
     elif int(inputs[0]) == 4:
-        print("\nBuscando accidentes x grupo de ofensa en una fecha: ")
+        print("\nBuscando accidentes según severidad en una fecha: ")
         initialDate = input("Fecha (YYYY-MM-DD): ")
-        severity = input("Grado de severidad: ")
-        numoffenses = controller.getAccidentsByRangeSeverity(cont, initialDate,
-                                                      severity)
-        print("\nTotal de ofensas tipo: " + offensecode + " en esa fecha:  " +
-              str(numoffenses))
+
+        numoffenses = controller.getAccidentsByRangeSeverity(cont, initialDate)
+        print(numoffenses)
 
     else:
         sys.exit(0)

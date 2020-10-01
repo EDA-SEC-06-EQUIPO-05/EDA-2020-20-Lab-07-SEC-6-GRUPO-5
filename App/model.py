@@ -299,23 +299,23 @@ def getAccidentsByRangeSeverity(analyzer, Date):
     """
     Para una fecha determinada, retorna el numero de accidentes de diferentes severidades.
     """
+    a = 0
+    b = 0
+    c = 0
     accidentdate = om.get(analyzer['dateIndex'], Date)
-    if accidentdate["key"] is not None:
-        severitymap= me.getValue(accidentdate)['severityIndex']
-        #print(accidentdate)
-        #print(severitymap['table']['elements'])
-        for elements in severitymap['table']['elements']:
-            if elements['key'] is not None:
-                
-                numatype1= m.get(severitymap, "1")
-                numatype2= m.get(severitymap, "2")
-                numatype3= m.get(severitymap, "3")
-                print(elements)
-                len_1= m.size(me.getValue(numatype1)['lstaccidents'])
-                len_2= m.size(me.getValue(numatype2)['lstaccidents'])
-                len_3= m.size(me.getValue(numatype3)['lstaccidents'])
-                total_accidentes= len_1+len_2+len_3
-    return (total_accidentes,len_1,len_2,len_3)
+    if accidentdate['key'] is not None:
+        offensemap = me.getValue(accidentdate)['severityIndex']
+        numoffenses = m.get(offensemap, '1')
+        numoffenses2 = m.get(offensemap, '2')
+        numoffenses3 = m.get(offensemap, '3')
+        if numoffenses is not None:
+            a = m.size(me.getValue(numoffenses)['lstaccidents'])
+        if numoffenses2 is not None:
+            b = m.size(me.getValue(numoffenses2)['lstaccidents'])
+        if numoffenses3 is not None:
+            c = m.size(me.getValue(numoffenses3)['lstaccidents'])
+            return 'Total de accidentes de severidad 1: ' + ' ' + str(a) + '\nTotal de accidentes de severidad 2:' + ' ' + str(b) + '\nTotal de accidentes de severidad 3:' + ' ' + str(c) + '\nTotal de accidentes de la fecha:' + ' ' + str(c+a+b)
+        return 0
         
 
 # ==============================

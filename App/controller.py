@@ -149,7 +149,7 @@ def getCrimesByRangeCode(analyzer, initialDate,
     return model.getCrimesByRangeCode(analyzer, initialDate.date(),
                                       offensecode)
 
-def getAccidentsByRangeSeverity(analyzer, initialDate, severity):
+def getAccidentsByRangeSeverity(analyzer, initialDate):
     """
     Retorna el total de crimenes de un tipo especifico en una
     fecha determinada
