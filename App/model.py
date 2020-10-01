@@ -106,7 +106,7 @@ def updateDateIndex(map, crime):
     Si no se encuentra creado un nodo para esa fecha en el arbol
     se crea y se actualiza el indice de tipos de crimenes
     """
-    occurreddate = crime['OCCURRED_ON_DATE']
+    occurreddate = crime['Start_Time']
     crimedate = datetime.datetime.strptime(occurreddate, '%Y-%m-%d %H:%M:%S')
     entry = om.get(map, crimedate.date())
     if entry is None:
@@ -126,15 +126,15 @@ def updateDateIndexA(map, accident):
     Si no se encuentra creado un nodo para esa fecha en el arbol
     se crea y se actualiza el indice de tipos de crimenes
     """
-    occurreddate = accident['OCCURRED_ON_DATE']
+    occurreddate = accident['Start_Time']
     accidentdate = datetime.datetime.strptime(occurreddate, '%Y-%m-%d %H:%M:%S')
     entry = om.get(map, accidentdate.date())
     if entry is None:
-        datentry = newDataEntry(accident)
+        datentry = newDataSeverityEntry(accident)
         om.put(map, accidentdate.date(), datentry)
     else:
         datentry = me.getValue(entry)
-    addDateIndex(datentry, accident)
+    addDateIndexA(datentry, accident)
     return map
 
 
@@ -167,14 +167,14 @@ def addDateIndexA(datentry, accident):
     """
     lst = datentry['lstaccidents']
     lt.addLast(lst, accident)
-    offenseIndex = datentry['severityIndex']
-    offentry = m.get(offenseIndex, accident['Severity'])
-    if (offentry is None):
+    severityIndex = datentry['severityIndex']
+    seventry = m.get(severityIndex, accident['Severity'])
+    if (seventry is None):
         entry = newSeverityEntry(accident['Severity'], accident)
         lt.addLast(entry['lstaccidents'], accident)
-        m.put(offenseIndex, accident['Severity'], entry)
+        m.put(severityIndex, accident['Severity'], entry)
     else:
-        entry = me.getValue(offentry)
+        entry = me.getValue(seventry)
         lt.addLast(entry['lstaccidents'], accident)
     return datentry
 
@@ -190,7 +190,9 @@ def newDataEntry(crime):
     entry['lstcrimes'] = lt.newList('SINGLE_LINKED', compareDates)
     return entry
 
-def newDataSeverityEntry(crime):
+
+
+def newDataSeverityEntry(accident):
     """
     Crea una entrada en el indice por fechas, es decir en el arbol
     binario.
@@ -201,6 +203,7 @@ def newDataSeverityEntry(crime):
                                      comparefunction=compareSeverity)
     entry['lstaccidents'] = lt.newList('SINGLE_LINKED', compareDates)
     return entry
+
 
 def newOffenseEntry(offensegrp, crime):
     """
@@ -299,13 +302,19 @@ def getAccidentsByRangeSeverity(analyzer, Date):
     accidentdate = om.get(analyzer['dateIndex'], Date)
     if accidentdate["key"] is not None:
         severitymap= me.getValue(accidentdate)['severityIndex']
-        numatype1= m.get(severitymap, "1")
-        numatype2= m.get(severitymap, "2")
-        numatype3= m.get(severitymap, "3")
-        len_1= m.size(me.getValue(numatype1)['lstaccidents'])
-        len_2= m.size(me.getValue(numatype2)['lstaccidents'])
-        len_3= m.size(me.getValue(numatype3)['lstaccidents'])
-        total_accidentes= len_1+len_2+len_3
+        #print(accidentdate)
+        #print(severitymap['table']['elements'])
+        for elements in severitymap['table']['elements']:
+            if elements['key'] is not None:
+                
+                numatype1= m.get(severitymap, "1")
+                numatype2= m.get(severitymap, "2")
+                numatype3= m.get(severitymap, "3")
+                print(elements)
+                len_1= m.size(me.getValue(numatype1)['lstaccidents'])
+                len_2= m.size(me.getValue(numatype2)['lstaccidents'])
+                len_3= m.size(me.getValue(numatype3)['lstaccidents'])
+                total_accidentes= len_1+len_2+len_3
     return (total_accidentes,len_1,len_2,len_3)
         
 

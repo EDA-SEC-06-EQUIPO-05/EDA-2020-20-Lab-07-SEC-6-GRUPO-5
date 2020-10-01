@@ -43,7 +43,7 @@ def init():
     Llama la funcion de inicializacion  del modelo.
     """
     # catalog es utilizado para interactuar con el modelo
-    analyzer = model.newAnalyzer()
+    analyzer = model.newAnalyzerA()
     return analyzer
 
 
@@ -71,7 +71,7 @@ def loadDataA(analyzer, accidentsfile):
     input_file = csv.DictReader(open(accidentsfile, encoding="utf-8"),
                                 delimiter=",")
     for accident in input_file:
-        model.addaccident(analyzer, accident)
+        model.addAccident(analyzer, accident)
     return analyzer
 
 # ___________________________________________________
@@ -84,6 +84,12 @@ def crimesSize(analyzer):
     Numero de crimenes leidos
     """
     return model.crimesSize(analyzer)
+
+def accidentsSize(analyzer):
+    """
+    Numero de crimenes leidos
+    """
+    return model.accidentsSize(analyzer)
 
 
 def indexHeight(analyzer):
@@ -143,7 +149,7 @@ def getCrimesByRangeCode(analyzer, initialDate,
     return model.getCrimesByRangeCode(analyzer, initialDate.date(),
                                       offensecode)
 
-def getAccidentsByRangeSeverity(analyzer, initialDate):
+def getAccidentsByRangeSeverity(analyzer, initialDate, severity):
     """
     Retorna el total de crimenes de un tipo especifico en una
     fecha determinada
