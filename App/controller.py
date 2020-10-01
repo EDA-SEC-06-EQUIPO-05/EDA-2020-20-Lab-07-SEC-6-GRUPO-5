@@ -141,6 +141,7 @@ def getAccidentsByRange(analyzer, initialDate, finalDate):
 
 def getCrimesByRangeCode(analyzer, initialDate,
                          offensecode):
+                         
     """
     Retorna el total de crimenes de un tipo especifico en una
     fecha determinada
